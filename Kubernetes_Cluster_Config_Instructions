@@ -1,0 +1,29 @@
+Description: List of actions to configure Kubernetes cluster.  Order is important.
+
+1 - Master/ Minion  - Install NTP and enable/ start NTPD service
+2 - Master/ Minion  - Update /etc/host with internal IP and alias
+3 - Master/ Minion  - Create docker repo in /etc/yum.repos.d/virt7-docker-common-release.repo
+			[virt7-docker-common-release]
+			name=virt7-docker-common-release
+			baseurl=http://cbs.centos.org/repos/virt7-docker-common-release/x86_64/os/
+			gpgcheck=0
+4 - Master/ Minion  - Make sure IPTABLES and FIREWALLD are not running
+5 - Master/ Minion  - Install KUBERNETES, DOCKER, ETCD using --enablerepo
+6 - Master/ Minion  - Edit /etc/kubernetes/config
+                    - Update master with host alias
+                    - Add KUBE_ETCD_SERVERS with master alias with 2370
+7 - Master          - Edit /etc/etcd/etcd.conf
+ 	                  - ETCD_LISTEN_CLIENT_URLS to 0.0.0.0
+	                  - ETCD_ADVERTISE_CLIENT_URLS to 0.0.0.0
+8 - Master          - Edit /etc/kubernetes/apiserver
+	                  - KUBE_API_SERVER address to 0.0.0.0
+	                  - Uncomment api and kubelet port
+	                  - (Maybe) comment out admission control policy
+9 - Master          - Enable then start: ETCD, KUBE-APISERVER, KUBE-CONTROLLER-MANAGER, KUBE-SCHEDULER
+10 - Minion         - Edit /etc/kubernetes/kubelet
+	                  - Switch KUBELET_ADDRESS to 0.0.0.0
+                    - Open kubelet port: 10250
+                    - Insert minion (KUBELET)/ master host aliases (APISERVER)
+11 - Minion         - Enable then start: KUBE-PROXY, KUBELET, DOCKER
+12 - Minion         - Test docker pull image
+13 - Master         - Test kubectl get nodes
