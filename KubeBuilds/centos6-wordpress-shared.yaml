@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: centos6-wordpress-shared
+spec:
+  replicas: 2
+  selector:
+    app: centos6-wordpress
+  template:
+    metadata:
+     name: centos6-wordpress
+     labels:
+       app: centos6-wordpress
+    spec:
+      containers:
+      - name: centos6-wordpress-shared1
+        image: broomcj/centos6-wordpress-shared
+        ports:
+        - containerPort: 80
