@@ -1,0 +1,33 @@
+# Docker file for the centos6-wordpress-shared image
+
+FROM centos:6
+
+MAINTAINER broomcj@gmail.com
+
+# install our software
+
+RUN yum -y install httpd elinks php php-mysql
+
+# get the local file for wordpress
+
+ADD latest.tar.gz /var/www
+
+# get rid of defaults
+
+RUN ["rm", "-rf", "/var/www/html"]
+
+# copy wordpress files across
+RUN ["cp", "-r", "/var/www/wordpress/", "/var/www/html/"]
+
+# add updated wpconfig file
+
+ADD wp-config.php /var/www/html/
+
+# remove wordpress ample file
+RUN ["rm", "/var/www/html/wp-config-sample.php"]
+
+# expose port 80
+EXPOSE 80
+
+# set default app to run
+ENTRYPOINT ["/usr/sbin/httpd", "-D", "FOREGROUND"]
